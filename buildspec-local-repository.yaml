@@ -1,0 +1,50 @@
+
+version: 0.2
+
+env:
+  variables:
+    AWS_REGION:
+    AWS_ACCOUNT_ID:
+    AWS_SERVICE_NAME:
+    AWS_DOMAIN_NAME: localhost:5000
+    IMAGE_NAME: aws-codebuild-locally-build-docker-image
+    CONTAINER_NAME: aws-codebuild-locally-build-docker-container
+
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto8
+    commands:
+  pre_build:
+    commands:
+      - REPOSITORY_URL="$AWS_ACCOUNT_ID$AWS_SERVICE_NAME$AWS_REGION$AWS_DOMAIN_NAME"
+      - echo $REPOSITORY_URL
+      - echo Setting up docker
+      - nohup /usr/local/bin/dockerd --host=unix:///var/run/docker.sock --host=tcp://127.0.0.1:2375 --storage-driver=overlay2 &
+      - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
+      - echo Logging in to Amazon ECR...
+#      Commented out because this CodeBuild project won't need to communicate with AWS Services
+#      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URL
+  build:
+    commands:
+      - echo Build started on `date`
+      - 'mvn clean package'
+  post_build:
+    commands:
+      - docker image build -t $IMAGE_NAME .
+      - docker image tag $IMAGE_NAME:latest $REPOSITORY_URL/$IMAGE_NAME:latest
+      - echo image name =  $IMAGE_NAME:latest
+      - echo image url = $REPOSITORY_URL/$IMAGE_NAME:latest
+      - docker push $REPOSITORY_URL/$IMAGE_NAME:latest
+      - echo Writing image definitions file...
+      #       name is a container name from the task definition
+      - printf '[{"name":"'"$CONTAINER_NAME"'","imageUri":"'"$REPOSITORY_URL"'/'"$IMAGE_NAME"':latest"}]' > imagedefinitions.json
+      - cat imagedefinitions.json
+      - echo Build completed on `date`
+
+
+artifacts:
+  files:
+    - imagedefinitions.json
+
