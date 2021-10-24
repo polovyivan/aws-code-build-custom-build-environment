@@ -5,7 +5,7 @@ FROM amazoncorretto:16-alpine-jdk
 RUN apk add --no-cache curl
 
 # 2- Define a constant with the version of Maven
-ARG MAVEN_VERSION=3.8.2
+ARG MAVEN_VERSION=3.8.3
 
 # 3- Define a constant with the directory for Maven installation
 ARG MAVEN_HOME_DIR=usr/share/maven

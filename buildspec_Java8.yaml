@@ -1,4 +1,4 @@
-
+# Serves as an example to compare with new buildspec.yaml
 version: 0.2
 
 env:
@@ -28,10 +28,10 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-#      - 'mvn clean package'
+      - 'mvn clean package'
   post_build:
     commands:
-      - docker image build -f Dockerfile -t $IMAGE_NAME .
+      - docker image build -f Dockerfile_Java8 -t $IMAGE_NAME .
       - docker image tag $IMAGE_NAME:latest $REPOSITORY_URL/$IMAGE_NAME:latest
       - echo image name =  $IMAGE_NAME:latest
       - echo image url = $REPOSITORY_URL/$IMAGE_NAME:latest

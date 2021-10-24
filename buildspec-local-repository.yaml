@@ -1,4 +1,4 @@
-
+# For local builds using a Docker Registry (docker-compose.yaml)
 version: 0.2
 
 env:
@@ -26,10 +26,10 @@ phases:
       - echo Logging in to Amazon ECR...
 #      Commented out because this CodeBuild project won't need to communicate with AWS Services
 #      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URL
-  build:
-    commands:
-      - echo Build started on `date`
-      - 'mvn clean package'
+#  build:
+#    commands:
+#      - echo Build started on `date`
+#      - 'mvn clean package'
   post_build:
     commands:
       - docker image build -t $IMAGE_NAME .
