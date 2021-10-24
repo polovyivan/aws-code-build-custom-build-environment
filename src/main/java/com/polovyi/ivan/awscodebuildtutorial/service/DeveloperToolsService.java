@@ -1,12 +1,14 @@
 package com.polovyi.ivan.awscodebuildtutorial.service;
 
 import com.polovyi.ivan.awscodebuildtutorial.dto.DeveloperToolsResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Service
+@Slf4j
 public class DeveloperToolsService {
 
     private static final Set<DeveloperToolsResponse> developerTools;
@@ -21,11 +23,12 @@ public class DeveloperToolsService {
     }
 
     public Set<DeveloperToolsResponse> getAllTools() {
+       log.info("Getting all tools...");
         return developerTools;
     }
 
     public DeveloperToolsResponse getDeveloperToolById(Integer id) {
-
+        log.info("Getting tool by id {}", id);
         return developerTools.stream().filter(t->t.getId().equals(id)).findFirst().orElse(null);
     }
 }
