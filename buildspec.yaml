@@ -31,6 +31,7 @@ phases:
 #      - 'mvn clean package'
   post_build:
     commands:
+      - docker ps
       - docker image build -t $IMAGE_NAME .
       - docker image tag $IMAGE_NAME:latest $REPOSITORY_URL/$IMAGE_NAME:latest
       - echo image name =  $IMAGE_NAME:latest
