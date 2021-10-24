@@ -12,10 +12,6 @@ env:
 
 
 phases:
-  install:
-    runtime-versions:
-      java: corretto8
-    commands:
   pre_build:
     commands:
       - REPOSITORY_URL="$AWS_ACCOUNT_ID$AWS_SERVICE_NAME$AWS_REGION$AWS_DOMAIN_NAME"
@@ -26,11 +22,7 @@ phases:
       - echo Logging in to Amazon ECR...
 #      Commented out because this CodeBuild project won't need to communicate with AWS Services
 #      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URL
-#  build:
-#    commands:
-#      - echo Build started on `date`
-#      - 'mvn clean package'
-  post_build:
+  build:
     commands:
       - docker image build -t $IMAGE_NAME .
       - docker image tag $IMAGE_NAME:latest $REPOSITORY_URL/$IMAGE_NAME:latest
