@@ -1,4 +1,4 @@
-# For local builds using a Docker Registry (docker-compose.yaml)
+# For local builds using a Docker Registry (run docker-compose.yaml)
 version: 0.2
 
 env:
@@ -7,8 +7,8 @@ env:
     AWS_ACCOUNT_ID:
     AWS_SERVICE_NAME:
     AWS_DOMAIN_NAME: localhost:5000
-    IMAGE_NAME: aws-codebuild-locally-build-docker-image
-    CONTAINER_NAME: aws-codebuild-locally-build-docker-container
+    IMAGE_NAME: aws-code-build-custom-build-environment-local-image
+    CONTAINER_NAME: aws-code-build-custom-build-environment-local-container
 
 
 phases:

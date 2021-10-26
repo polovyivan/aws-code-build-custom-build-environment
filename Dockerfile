@@ -1,5 +1,5 @@
 
-FROM amazoncorretto:16-alpine-jdk
+FROM amazoncorretto:17-alpine-jdk
 
 # 1- Add curl
 RUN apk add --no-cache curl

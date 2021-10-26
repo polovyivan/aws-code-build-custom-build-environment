@@ -23,12 +23,10 @@ phases:
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $REPOSITORY_URL
   build:
     commands:
-      - docker ps
       - docker image build --no-cache -t $IMAGE_NAME .
       - docker image tag $IMAGE_NAME:latest $REPOSITORY_URL/$IMAGE_NAME:latest
       - echo image name =  $IMAGE_NAME:latest
       - echo image url = $REPOSITORY_URL/$IMAGE_NAME:latest
-      - docker ps
       - docker push $REPOSITORY_URL/$IMAGE_NAME:latest
       - echo Writing image definitions file...
 #       name is a container name from the task definition
