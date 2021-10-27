@@ -14,7 +14,7 @@ ARG SHA=1c12a5df43421795054874fd54bb8b37d242949133b5bf6052a063a13a93f13a20e6e9da
 ARG MAVEN_HOME_DIR=usr/share/maven
 
 # 5- Define a constant with the working directory
-ARG APP_DIR="app"
+ENV APP_DIR="app"
 
 # 6- Define the URL where maven can be downloaded from
 ARG BASE_URL=https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries
@@ -51,7 +51,10 @@ WORKDIR /$APP_DIR
 # 12- Build and package source code using Maven
 RUN mvn clean package
 
-# 13- Remove Maven and source code of an application to make an image cleaner
+# 13- Copy jar file to work directory
+RUN mv target/$APP_NAME.jar .
+
+# 14- Remove Maven and source code of an application to make an image cleaner
 RUN echo "[ECHO] Removing source code" \
     && rm -rf /$APP_DIR/src \
     \
@@ -62,9 +65,15 @@ RUN echo "[ECHO] Removing source code" \
     && rm -rf $MAVEN_CONFIG \
     \
     && echo "[ECHO] Removing maven binaries"  \
-    && rm -rf /$MAVEN_HOME_DIR
+    && rm -rf /$MAVEN_HOME_DIR \
+    \
+    && echo "[ECHO] Removing curl binaries"  \
+    && apk del --no-cache curl \
+    \
+    && echo "[ECHO] Removing java files"  \
+    && rm -rf /$APP_DIR/target
 
 VOLUME /tmp
 EXPOSE 8080
 
-ENTRYPOINT exec java -jar $JAR_FILE -Djava.security.egd=file:/dev/./urandom $JAVA_OPTS
+ENTRYPOINT exec java -jar $APP_NAME.jar -Djava.security.egd=file:/dev/./urandom $JAVA_OPTS
