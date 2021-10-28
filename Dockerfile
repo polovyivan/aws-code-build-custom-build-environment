@@ -14,12 +14,12 @@ ARG SHA=1c12a5df43421795054874fd54bb8b37d242949133b5bf6052a063a13a93f13a20e6e9da
 ARG MAVEN_HOME_DIR=usr/share/maven
 
 # 5- Define a constant with the working directory
-ENV APP_DIR="app"
+ARG APP_DIR="app"
 
 # 6- Define the URL where maven can be downloaded from
 ARG BASE_URL=https://archive.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries
 
-# 7- Create the directories, download Maven, validate the download, install it, remove downloaded file and set links
+# 7- Create the directories, download Maven, validate the download, install it, remove the downloaded file, and set links
 RUN mkdir -p /$MAVEN_HOME_DIR /$MAVEN_HOME_DIR/ref \
   && echo "[ECHO] Downloading maven" \
   && curl -fsSL -o /tmp/apache-maven.tar.gz ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
@@ -34,24 +34,23 @@ RUN mkdir -p /$MAVEN_HOME_DIR /$MAVEN_HOME_DIR/ref \
   && rm -f /tmp/apache-maven.tar.gz \
   && ln -s /$MAVEN_HOME_DIR/bin/mvn /usr/bin/mvn
 
-# 8- Define environmental variables required by Maven, like Maven_Home directory and where the maven repo is located
+# 8- Define environmental variables required by Maven, like the Maven_Home directory and where the maven repo is located
 ENV MAVEN_CONFIG "/${APP_DIR}/.m2"
 
-# 9- Define app name and build directory variables
+# 9- Define app name an artifactId from POM
 ENV APP_NAME aws-code-build-custom-build-environment
-ENV JAR_FILE /$APP_DIR/target/$APP_NAME.jar
 
 # 10- Copy source code and POM
 COPY ./src ./$APP_DIR/src
 COPY pom.xml ./$APP_DIR
 
-# 11- Define app directory as work directory
+# 11- Define app directory as the working directory
 WORKDIR /$APP_DIR
 
 # 12- Build and package source code using Maven
 RUN mvn clean package
 
-# 13- Copy jar file to work directory
+# 13- Copy jar file to the work directory
 RUN mv target/$APP_NAME.jar .
 
 # 14- Remove Maven and source code of an application to make an image cleaner
@@ -61,6 +60,9 @@ RUN echo "[ECHO] Removing source code" \
     && echo "[ECHO] Removing pom.xml"  \
     && rm -f /$APP_DIR/pom.xml \
     \
+     && echo "[ECHO] Removing output of the build"  \
+    && rm -rf /$APP_DIR/target \
+    \
     && echo "[ECHO] Removing local maven repository ${MAVEN_CONFIG}"  \
     && rm -rf $MAVEN_CONFIG \
     \
@@ -68,10 +70,7 @@ RUN echo "[ECHO] Removing source code" \
     && rm -rf /$MAVEN_HOME_DIR \
     \
     && echo "[ECHO] Removing curl binaries"  \
-    && apk del --no-cache curl \
-    \
-    && echo "[ECHO] Removing java files"  \
-    && rm -rf /$APP_DIR/target
+    && apk del --no-cache curl
 
 VOLUME /tmp
 EXPOSE 8080
