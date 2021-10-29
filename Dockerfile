@@ -72,7 +72,7 @@ RUN echo "[ECHO] Removing source code" \
     && echo "[ECHO] Removing curl binaries"  \
     && apk del --no-cache curl
 
-VOLUME /tmp
+VOLUME $APP_DIR/tmp
 EXPOSE 8080
 
 ENTRYPOINT exec java -jar $APP_NAME.jar -Djava.security.egd=file:/dev/./urandom $JAVA_OPTS
